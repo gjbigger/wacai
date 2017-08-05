@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gj.wacai.message.dao.MessageDao">
+
+	<update id="updateSetIsNew0">
+		update t_message
+		set is_new = 0
+		where id = #{id} and is_valid = 1
+	</update>
+
+
+	<select id="selectByParam" resultType="message">
+		select id as id,
+				user_id as userId,
+				content as content,
+				create_time as createTime,
+				is_valid as isValid,
+				is_new as isNew
+		from t_message 
+		where is_valid = 1
+			and user_id = #{queryUserId}
+			<if test="queryIsNew != null">
+			and is_new = #{queryIsNew}
+			</if>
+			<if test="queryCreateTime != '' and queryCreateTime != null">
+			and DATE_FORMAT(create_time,'%Y-%m') = #{queryCreateTime}
+			</if>
+		order by is_new desc, create_time desc
+	</select>
+
+
+
+
+	<insert id="insert" parameterType="message">
+		insert into t_message(
+			user_id,
+			content,
+			create_time,
+			is_valid,
+			is_new
+		)
+		values(
+			#{userId},
+			#{content},
+			#{createTime},
+			#{isValid},
+			#{isNew}
+		)
+	</insert>
+
+
+	<select id="selectBill" resultType="billDto">
+		select a.user_id as userId,
+			   a.id as accountId,
+			   a.balance as balance,
+			   a.unit_id as unitId,
+			   a.bill_day as billDay,
+			   a.repay_day as repayDay,
+			   a.name as accountName,
+			   au.name as unitName
+	 	from t_account a
+	 	left join t_account_unit au on (a.unit_id = au.id)
+		where a.type_id = 2 
+			and a.is_valid = 1
+			<![CDATA[
+				and a.balance < 0
+			]]>
+			and a.bill_day = DATE_FORMAT(now(),'%d')
+	</select>
+	
+	
+	<select id="selectRepay" resultType="repayDto">
+		select a.user_id as userId,
+			   a.id as accountId,
+			   a.balance as balance,
+			   a.unit_id as unitId,
+			   a.repay_day as repayDay,
+			   a.name as accountName,
+			   au.name as unitName
+		from t_account a
+		left join t_account_unit au on (a.unit_id = au.id) 
+		where a.type_id = 2
+			and a.is_valid = 1
+			<![CDATA[
+				and a.balance < 0
+			]]>
+			and a.repay_day = DATE_FORMAT(DATE_ADD(NOW(),INTERVAL 3 DAY),'%d')
+	</select>
+	
+	<select id="selectSumMoney" resultType="java.lang.Double">
+		select sum(money)
+		from t_pay_out
+		where account_id = #{accountId}
+		<![CDATA[
+			and time > #{startTime}
+			and time <= #{endTime}
+		]]>
+	</select>
+</mapper>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gj.wacai.payInType.dao.PayInTypeDao">
+
+	<resultMap id="BaseResultMap" type="com.gj.wacai.payInType.pojo.PayInType">
+		<id column="id" property="id" jdbcType="INTEGER"/>
+		<result column="name" property="name" jdbcType="VARCHAR"/>
+		<result column="user_id" property="userId" jdbcType="INTEGER"/>
+		<result column="is_valid" property="isValid" jdbcType="INTEGER"/>
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		id, name, user_id, is_valid
+	</sql>
+	
+	
+	
+	<insert id="insert" parameterType="payInType">
+		insert into t_pay_in_type(
+			name,
+			user_id,
+			is_valid
+		)
+		values (
+			#{name},
+			#{userId},
+			#{isValid}
+		)
+	</insert>
+	
+	
+	<update id="delete">
+		update t_pay_in_type
+		set is_valid = 0
+		where id = #{id}
+	</update>
+	
+	
+	
+	<select id="selectByUserIdAndName" resultMap="BaseResultMap">
+		select
+			<include refid="Base_Column_List" />
+		from t_pay_in_type
+		where name=#{name} and (user_id = #{userId} or user_id = 0) and is_valid = 1
+	</select>
+	
+	
+	<select id="selectByUserId" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" />
+		from t_pay_in_type
+		where (user_id = 0 or user_id = #{userId}) 
+			and is_valid = 1 
+	</select>
+
+	<select id="selectByIdAndUserId" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List"/>
+		from t_pay_in_type
+		where id = #{id} and (user_id=#{userId} or user_id = 0)
+			and is_valid = 1
+	</select>
+
+</mapper>

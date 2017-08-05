@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gj.wacai.payOutSmallType.dao.PayOutSmallTypeDao">
+
+	<resultMap id="BaseResultMap"
+		type="com.gj.wacai.payOutSmallType.pojo.PayOutSmallType">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="pid" property="pid" jdbcType="INTEGER" />
+		<result column="user_id" property="userId" jdbcType="INTEGER" />
+		<result column="is_valid" property="isValid" jdbcType="INTEGER"/>
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id, name, pid, user_id, is_valid
+	</sql>
+	
+	
+	<insert id="insert" parameterType="payOutSmallType">
+		insert into t_pay_out_small_type(
+			name,
+			pid,
+			user_id,
+			is_valid
+		)
+		values (
+			#{name},
+			#{pid},
+			#{userId},
+			#{isValid}
+		)
+	</insert>
+	
+	
+	<update id="delete">
+		update t_pay_out_small_type
+		set is_valid = 0
+		where id = #{id}
+	</update>
+	
+	
+	<select id="selectByUserIdAndNameAndPid" resultMap="BaseResultMap">
+		select
+			<include refid="Base_Column_List" />
+		from t_pay_out_small_type
+		where name=#{name} and (user_id = #{userId} or user_id = 0) and is_valid = 1 and pid = #{pid}
+	</select>
+	
+	
+
+	<select id="selectByIdAndUserId" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from t_pay_out_small_type
+		where id = #{id,jdbcType=INTEGER} and (user_id = #{userId} or user_id = 0) and is_valid = 1
+	</select>
+
+	<select id="selectByPidAndUserId" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from t_pay_out_small_type
+		where pid = #{pid} and (user_id = 0 or user_id = #{userId}) and is_valid = 1
+	</select>
+</mapper>

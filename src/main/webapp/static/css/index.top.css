@@ -1,0 +1,62 @@
+/**
+导航栏中的li悬停效果
+ */
+.navbar .nav > li .dropdown-menu {
+    margin: 0;
+}
+
+.navbar .nav > li:hover .dropdown-menu {
+    display: block;
+}
+
+
+/**
+最顶部的首页与帮助中心样式
+ */
+.site-nav {
+    position: relative;
+    z-index: 9999;
+    height: 30px;
+    border-bottom: 1px solid #e5e5e5;
+    background: #f2f2f2;
+    line-height: 30px
+}
+
+.site-nav a {
+    color: #999
+}
+
+.site-nav a:hover {
+    text-decoration: underline
+}
+
+.site-map .home {
+    position: relative
+}
+
+.site-map .home:before {
+    content: "";
+    position: absolute;
+    left: -20px;
+    top: 50%;
+    width: 14px;
+    height: 12px;
+    margin-top: -6px;
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAANCAYAAACZ3F9/AAAAAXNSR0IArs4c6QAAANhJREFUKM/NkqEOwjAURStQKAT/MQXhXwBDggGLRFSUrRNILAlqH0Cw0yDZL/QHkDNQ7k1ekwboNE3O9vreva9dV6USwxgzLopixFhrPUC8yPN8rrqGtXYN4VNYockEOU+SJnTdUQDDiUh8ThqxnR4KRxGUYC+UwfRlhKmPrhduDStuIKgiccUca5xTG0xDJG6ghWCJdx2vINRSa9HgSg8PogEPMJPYJ2h4qtTCfFd4TDHJgOswBajJ6Il/wafoJfjk4fwwuijv/s+4xUcfCG9PfJNCnpqQfwPhpylfd+0Q+AAAAABJRU5ErkJggg==) no-repeat;
+    opacity: .8;
+    filter: alpha(opacity=80)
+}
+
+.site-map {
+    float: right;
+}
+
+.site-map li {
+    list-style: none;
+    float: left;
+    padding: 0 15px
+}
+
+.site-map .last {
+    padding-right: 60px;
+}

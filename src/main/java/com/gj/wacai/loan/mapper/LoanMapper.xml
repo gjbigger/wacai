@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gj.wacai.loan.dao.LoanDao">
+
+	<resultMap id="BaseResultMap" type="com.gj.wacai.loan.pojo.Loan">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="money" property="money" jdbcType="DOUBLE" />
+		<result column="type_id" property="typeId" jdbcType="INTEGER" />
+		<result column="account_id" property="accountId" jdbcType="INTEGER" />
+		<result column="loan_body_account_id" property="loanBodyAccountId" jdbcType="INTEGER"/>
+		<result column="time" property="time" jdbcType="TIMESTAMP" />
+		<result column="remark" property="remark" jdbcType="VARCHAR" />
+		<result column="user_id" property="userId" jdbcType="INTEGER" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="is_valid" property="isValid" jdbcType="INTEGER" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id, money, type_id, account_id,loan_body_account_id, time, remark, user_id,
+		create_time,
+		update_time,
+		is_valid
+	</sql>
+
+	<sql id="Dto_Column_List">
+		l.id as id, l.money as money, l.type_id as typeId,
+		l.account_id as
+		accountId,l.loan_body_account_id as loanBodyAccountId,
+		l.time as time, l.remark as remark, l.user_id
+		as
+		userId,l.create_time as createTime,
+		l.update_time as updateTime,
+		l.is_valid as isValid,lt.name as typeName, a.name as accountName,
+		a2.name as loanBodyAccountName
+	</sql>
+
+
+	<select id="selectByIdAndUserId" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from t_loan
+		where id = #{id,jdbcType=INTEGER} and user_id = #{userId} and is_valid = 1
+	</select>
+
+	<insert id="insert" parameterType="com.gj.wacai.loan.pojo.Loan">
+		insert into t_loan
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="money != null">
+				money,
+			</if>
+			<if test="typeId != null">
+				type_id,
+			</if>
+			<if test="accountId != null">
+				account_id,
+			</if>
+			<if test="loanBodyAccountId != null">
+				loan_body_account_id,
+			</if>
+			<if test="time != null">
+				time,
+			</if>
+			<if test="remark != null">
+				remark,
+			</if>
+			<if test="userId != null">
+				user_id,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+			<if test="updateTime != null">
+				update_time,
+			</if>
+			<if test="isValid != null">
+				is_valid,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="money != null">
+				#{money,jdbcType=DOUBLE},
+			</if>
+			<if test="typeId != null">
+				#{typeId,jdbcType=INTEGER},
+			</if>
+			<if test="accountId != null">
+				#{accountId,jdbcType=INTEGER},
+			</if>
+			<if test="loanBodyAccountId != null">
+				#{loanBodyAccountId,jdbcType=INTEGER},
+			</if>
+			<if test="time != null">
+				#{time,jdbcType=TIMESTAMP},
+			</if>
+			<if test="remark != null">
+				#{remark,jdbcType=VARCHAR},
+			</if>
+			<if test="userId != null">
+				#{userId,jdbcType=INTEGER},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="isValid != null">
+				#{isValid,jdbcType=INTEGER},
+			</if>
+		</trim>
+	</insert>
+
+	<update id="update" parameterType="com.gj.wacai.loan.pojo.Loan">
+		update t_loan
+		<set>
+			<if test="money != null">
+				money = #{money,jdbcType=DOUBLE},
+			</if>
+			<if test="typeId != null">
+				type_id = #{typeId,jdbcType=INTEGER},
+			</if>
+			<if test="accountId != null">
+				account_id = #{accountId,jdbcType=INTEGER},
+			</if>
+			<if test="loanBodyAccountId != null">
+				loan_body_account_id = #{loanBodyAccountId,jdbcType=INTEGER},
+			</if>
+			<if test="time != null">
+				time = #{time,jdbcType=TIMESTAMP},
+			</if>
+			<if test="remark != null">
+				remark = #{remark,jdbcType=VARCHAR},
+			</if>
+			<if test="userId != null">
+				user_id = #{userId,jdbcType=INTEGER},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				update_time = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+
+	<select id="selectByParams" parameterType="loanQuery" resultType="loanDto">
+		select
+		<include refid="Dto_Column_List" />
+		from t_loan l
+		left join t_loan_type lt on (l.type_id = lt.id)
+		left join t_account a on (l.account_id = a.id)
+		left join t_account a2 on (l.loan_body_account_id = a2.id)
+		<where>
+			l.user_id = #{userId} and l.is_valid = 1
+			<if test="queryLoanTypeId != null">
+				and l.type_id = #{queryLoanTypeId}
+			</if>
+			<if test="queryLoanBodyAccountId !=null">
+				and l.loan_body_account_id = #{queryLoanBodyAccountId}
+			</if>
+			<if test="queryLoanTime !=null and queryLoanTime !=''">
+			<![CDATA[
+			and l.time <= #{queryLoanTime}
+			]]>
+			</if>
+		</where>
+	</select>
+
+	<update id="deleteByIdAndUserId">
+	update t_loan
+	set is_valid = 0
+	where id=#{id} and user_id = #{userId}
+	</update>
+</mapper>

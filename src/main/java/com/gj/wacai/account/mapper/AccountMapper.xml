@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gj.wacai.account.dao.AccountDao">
+
+	<resultMap id="BaseResultMap" type="com.gj.wacai.account.pojo.Account">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="type_id" property="typeId" jdbcType="INTEGER" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="balance" property="balance" jdbcType="DOUBLE" />
+		<result column="unit_id" property="unitId" jdbcType="INTEGER" />
+		<result column="remark" property="remark" jdbcType="VARCHAR" />
+		<result column="user_id" property="userId" jdbcType="INTEGER" />
+		<result column="create_time" property="createTime" jdbcType="DATE" />
+		<result column="update_time" property="updateTime" jdbcType="DATE" />
+		<result column="limits" property="limits" jdbcType="DOUBLE" />
+		<result column="bill_day" property="billDay" jdbcType="INTEGER" />
+		<result column="repay_day" property="repayDay" jdbcType="INTEGER" />
+		<result column="is_valid" property="isValid" jdbcType="INTEGER"/>
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		id, type_id, name, balance, unit_id, remark, user_id,
+		create_time,
+		update_time, limits,
+		bill_day, repay_day, is_valid
+	</sql>
+	
+	<sql id="Dto_Column_List">
+		a.id as id, a.type_id as typeId, a.name as name,
+		a.balance
+		as balance, a.unit_id as unitId, a.remark as remark,
+		a.user_id as
+		userId, a.create_time as createTime,
+		a.update_time as updateTime,
+		a.limits as limits,
+		a.bill_day as billDay, a.repay_day as repayDay,
+		at.name as typeName, au.name as unitName, au.abbreviation as
+		unitAbbreviation
+	</sql>
+	
+	<select id="selectByIdAndUserId" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List"/>
+		from t_account
+		where id = #{id} and user_id = #{userId} and is_valid = 1
+	</select>
+	
+	<select id="selectByParams" parameterType="accountQuery" resultType="accountDto">
+		select <include refid="Dto_Column_List"/>
+		from t_account a
+		left join t_account_type at on (a.type_id = at.id)
+		left join t_account_unit au on (a.unit_id = au.id)
+		<where>
+			a.user_id = #{userId} and a.is_valid = 1
+			<if test="queryAccountName!=null and queryAccountName!=''">
+				and a.name like concat('%',#{queryAccountName},'%')
+			</if>
+			<if test="queryAccountTypeId!=null">
+				<choose>
+					<when test="queryAccountTypeId==5">
+						and a.type_id in (5,9,10,11,12,13)
+					</when>
+					<otherwise>
+						and a.type_id = #{queryAccountTypeId}
+					</otherwise>
+				</choose>
+			</if>
+			<if test="queryAccountCreateTime!=null and queryAccountCreateTime!=''">
+			<![CDATA[
+				and a.create_time <= #{queryAccountCreateTime}
+			]]>
+			</if>
+		</where>
+		order by a.create_time desc
+	</select>
+	
+	<select id="selectByNameAndUserId" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List"/>
+		from t_account
+		where user_id=#{userId}
+			and name=#{name}
+			and is_valid = 1
+	</select>
+	
+	<insert id="insert" parameterType="com.gj.wacai.account.pojo.Account">
+		insert into t_account
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="typeId != null">
+				type_id,
+			</if>
+			<if test="name != null">
+				name,
+			</if>
+			<if test="balance != null">
+				balance,
+			</if>
+			<if test="unitId != null">
+				unit_id,
+			</if>
+			<if test="remark != null">
+				remark,
+			</if>
+			<if test="userId != null">
+				user_id,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+			<if test="updateTime != null">
+				update_time,
+			</if>
+			<if test="limits != null">
+				limits,
+			</if>
+			<if test="billDay != null">
+				bill_day,
+			</if>
+			<if test="repayDay != null">
+				repay_day,
+			</if>
+			<if test="isValid != null">
+				is_valid
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="typeId != null">
+				#{typeId,jdbcType=INTEGER},
+			</if>
+			<if test="name != null">
+				#{name,jdbcType=VARCHAR},
+			</if>
+			<if test="balance != null">
+				#{balance,jdbcType=DOUBLE},
+			</if>
+			<if test="unitId != null">
+				#{unitId,jdbcType=INTEGER},
+			</if>
+			<if test="remark != null">
+				#{remark,jdbcType=VARCHAR},
+			</if>
+			<if test="userId != null">
+				#{userId,jdbcType=INTEGER},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=DATE},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=DATE},
+			</if>
+			<if test="limits != null">
+				#{limits,jdbcType=DOUBLE},
+			</if>
+			<if test="billDay != null">
+				#{billDay,jdbcType=INTEGER},
+			</if>
+			<if test="repayDay != null">
+				#{repayDay,jdbcType=INTEGER},
+			</if>
+			<if test="isValid != null">
+				#{isValid,jdbcType=INTEGER}
+			</if>
+		</trim>
+	</insert>
+	
+	<update id="update" parameterType="com.gj.wacai.account.pojo.Account">
+		update t_account
+		<set>
+			<if test="typeId != null">
+				type_id = #{typeId,jdbcType=INTEGER},
+			</if>
+			<if test="name != null">
+				name = #{name,jdbcType=VARCHAR},
+			</if>
+			<if test="balance != null">
+				balance = #{balance,jdbcType=DOUBLE},
+			</if>
+			<if test="unitId != null">
+				unit_id = #{unitId,jdbcType=INTEGER},
+			</if>
+			<if test="remark != null">
+				remark = #{remark,jdbcType=VARCHAR},
+			</if>
+			<if test="userId != null">
+				user_id = #{userId,jdbcType=INTEGER},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime,jdbcType=DATE},
+			</if>
+			<if test="updateTime != null">
+				update_time = #{updateTime,jdbcType=DATE},
+			</if>
+				limits = #{limits,jdbcType=DOUBLE},
+				bill_day = #{billDay,jdbcType=INTEGER},
+				repay_day = #{repayDay,jdbcType=INTEGER},
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	
+	<update id="deleteByIdAndUserId">
+		update t_account
+		set is_valid = 0
+		where id=#{id}
+			and user_id = #{userId}
+			and is_valid = 1
+	</update>
+	
+	<update id="moneyIn">
+		update t_account
+		set balance = balance + #{money}
+		where id = #{id} and user_id = #{userId} and is_valid = 1
+	</update>
+	
+	<update id="moneyOut">
+		update t_account
+		set balance = balance - #{money}
+		where id = #{id} and user_id = #{userId} and is_valid = 1
+	</update>
+	
+	<select id="selectByUserId" resultType="accountDto">
+		select <include refid="Dto_Column_List" />
+		from t_account a
+		left join t_account_type at on (a.type_id = at.id)
+		left join t_account_unit au on (a.unit_id = au.id)
+		where a.user_id = #{userId} and a.is_valid = 1
+	</select>
+	
+	<select id="selectByUserIdAndTypeIdIs8" resultType="accountDto">
+		select <include refid="Dto_Column_List" />
+		from t_account a
+		left join t_account_type at on (a.type_id = at.id)
+		left join t_account_unit au on (a.unit_id = au.id)
+		where a.user_id = #{userId} and a.is_valid = 1 and a.type_id = 8
+	</select>
+	
+	<select id="selectByUserIdAndTypeIdIsNot8" resultType="accountDto">
+		select <include refid="Dto_Column_List" />
+		from t_account a
+		left join t_account_type at on (a.type_id = at.id)
+		left join t_account_unit au on (a.unit_id = au.id)
+		where a.user_id = #{userId} and a.is_valid = 1 and a.type_id != 8
+	</select>
+</mapper>

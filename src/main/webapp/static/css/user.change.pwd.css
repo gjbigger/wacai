@@ -1,0 +1,32 @@
+#change_pwd_form {
+	margin-top: 25px;
+}
+
+#change_pwd_form .input_info {
+	witdh: 210px;
+	margin-top: 10px;
+	margin-left: 10px;
+}
+
+#change_pwd_form label {
+	font-weight: normal;
+	margin-right: 10px;
+}
+
+#change_pwd_form .input_info select {
+	width: 175px;
+	height: 27px;
+}
+
+#change_pwd_form .input_info input[type="date"] {
+	width: 175px;
+	height: 27px;
+}
+
+#change_pwd_form .input_info textarea {
+	resize: none;
+	overflow: auto;
+	width: 300px;
+	height: 70px;
+	vertical-align: top;
+}

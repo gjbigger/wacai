@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gj.wacai.payOut.dao.PayOutDao">
+
+	<resultMap id="BaseResultMap" type="com.gj.wacai.payOut.pojo.PayOut">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="money" property="money" jdbcType="DOUBLE" />
+		<result column="big_type_id" property="bigTypeId" jdbcType="INTEGER" />
+		<result column="small_type_id" property="smallTypeId" jdbcType="INTEGER" />
+		<result column="account_id" property="accountId" jdbcType="INTEGER" />
+		<result column="time" property="time" jdbcType="TIMESTAMP" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="remark" property="remark" jdbcType="VARCHAR" />
+		<result column="user_id" property="userId" jdbcType="INTEGER" />
+		<result column="is_valid" property="isValid" jdbcType="INTEGER" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id, money, big_type_id,small_type_id, account_id, time,
+		create_time,
+		update_time, remark,
+		user_id,is_valid
+	</sql>
+
+	<sql id="Dto_Column_List">
+		po.id as id,po.money as money, po.big_type_id as bigTypeId,
+		po.small_type_id as smallTypeId,
+		po.account_id as accountId,po.time as
+		time, po.remark as remark,po.create_time as
+		createTime,
+		po.update_time
+		as updateTime,po.user_id as userId,pobt.name as bigTypeName,post.name
+		as smallTypeName,
+		a.name as accountName,po.is_valid as isValid
+	</sql>
+
+
+	<insert id="insert" parameterType="com.gj.wacai.payOut.pojo.PayOut">
+		insert into t_pay_out
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="money != null">
+				money,
+			</if>
+			<if test="bigTypeId != null">
+				big_type_id,
+			</if>
+			<if test="smallTypeId != null">
+				small_type_id,
+			</if>
+			<if test="accountId != null">
+				account_id,
+			</if>
+			<if test="time != null">
+				time,
+			</if>
+			<if test="remark != null">
+				remark,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+			<if test="updateTime != null">
+				update_time,
+			</if>
+			<if test="userId != null">
+				user_id,
+			</if>
+			<if test="isValid != null">
+				is_valid
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="money != null">
+				#{money,jdbcType=DOUBLE},
+			</if>
+			<if test="bigTypeId != null">
+				#{bigTypeId,jdbcType=INTEGER},
+			</if>
+			<if test="smallTypeId != null">
+				#{smallTypeId,jdbcType=INTEGER},
+			</if>
+			<if test="accountId != null">
+				#{accountId,jdbcType=INTEGER},
+			</if>
+			<if test="time != null">
+				#{time,jdbcType=TIMESTAMP},
+			</if>
+			<if test="remark != null">
+				#{remark,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="userId != null">
+				#{userId,jdbcType=INTEGER},
+			</if>
+			<if test="isValid != null">
+				#{isValid,jdbcType=INTEGER},
+			</if>
+		</trim>
+	</insert>
+
+	<select id="selectByParams" parameterType="payOutQuery" resultType="payOutDto">
+		select
+		<include refid="Dto_Column_List" />
+		from t_pay_out po
+		left join t_pay_out_big_type pobt on (po.big_type_id = pobt.id)
+		left join t_pay_out_small_type post on (po.small_type_id = post.id)
+		left join t_account a on (po.account_id = a.id)
+		<where>
+			po.user_id = #{userId} and po.is_valid = 1
+			<if test="queryPayOutBigTypeId!=null">
+				and po.big_type_id = #{queryPayOutBigTypeId}
+			</if>
+			<if test="queryPayOutAccountId!=null">
+				and po.account_id = #{queryPayOutAccountId}
+			</if>
+			<if test="queryPayOutTime!=null and queryPayOutTime!=''">
+ 			<![CDATA[
+ 			and po.time <= #{queryPayOutTime}
+ 			]]>
+			</if>
+		</where>
+		order by po.time desc
+	</select>
+
+	<select id="selectByIdAndUserId" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from t_pay_out
+		where id = #{id} and user_id = #{userId} and is_valid = 1
+	</select>
+
+	<update id="update" parameterType="com.gj.wacai.payOut.pojo.PayOut">
+		update t_pay_out
+		<set>
+			<if test="money != null">
+				money = #{money,jdbcType=DOUBLE},
+			</if>
+			<if test="bigTypeId != null">
+				big_type_id = #{bigTypeId,jdbcType=INTEGER},
+			</if>
+			<if test="smallTypeId != null">
+				small_type_id = #{smallTypeId,jdbcType=INTEGER},
+			</if>
+			<if test="accountId != null">
+				account_id = #{accountId,jdbcType=INTEGER},
+			</if>
+			<if test="time != null">
+				time = #{time,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				update_time = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="remark != null">
+				remark = #{remark,jdbcType=VARCHAR},
+			</if>
+			<if test="userId != null">
+				user_id = #{userId,jdbcType=INTEGER},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+
+	<update id="deleteByIdAndUserId">
+		update t_pay_out
+		set is_valid = 0
+		where id=#{id} and user_id = #{userId}
+	</update>
+</mapper>

@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gj.wacai.transfer.dao.TransferDao">
+
+	<resultMap id="BaseResultMap" type="com.gj.wacai.transfer.pojo.Transfer">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="src_account_id" property="srcAccountId"
+			jdbcType="INTEGER" />
+		<result column="dest_account_id" property="destAccountId"
+			jdbcType="INTEGER" />
+		<result column="src_money" property="srcMoney" jdbcType="DOUBLE" />
+		<result column="dest_money" property="destMoney" jdbcType="DOUBLE" />
+		<result column="time" property="time" jdbcType="TIMESTAMP" />
+		<result column="remark" property="remark" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="user_id" property="userId" jdbcType="INTEGER" />
+		<result column="is_valid" property="isValid" jdbcType="INTEGER"/>
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id, src_account_id, dest_account_id, src_money, dest_money,
+		time, remark,
+		create_time,
+		update_time, user_id,is_valid
+	</sql>
+
+	<sql id="Dto_Column_List">
+		t.id as id, t.src_account_id as srcAccountId,
+		t.dest_account_id as
+		destAccountId,
+		t.src_money as srcMoney,
+		t.dest_money as destMoney, t.time as time, t.remark as
+		remark,
+		t.create_time as createTime, t.update_time as updateTime, t.user_id as
+		userId,t.is_valid as isValid,
+		a1.name as srcAccountName, a2.name as destAccountName
+	</sql>
+
+	
+	<insert id="insert" parameterType="com.gj.wacai.transfer.pojo.Transfer">
+		insert into t_transfer
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="srcAccountId != null">
+				src_account_id,
+			</if>
+			<if test="destAccountId != null">
+				dest_account_id,
+			</if>
+			<if test="srcMoney != null">
+				src_money,
+			</if>
+			<if test="destMoney != null">
+				dest_money,
+			</if>
+			<if test="time != null">
+				time,
+			</if>
+			<if test="remark != null">
+				remark,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+			<if test="updateTime != null">
+				update_time,
+			</if>
+			<if test="userId != null">
+				user_id,
+			</if>
+			<if test="isValid != null">
+				is_valid
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="srcAccountId != null">
+				#{srcAccountId,jdbcType=INTEGER},
+			</if>
+			<if test="destAccountId != null">
+				#{destAccountId,jdbcType=INTEGER},
+			</if>
+			<if test="srcMoney != null">
+				#{srcMoney,jdbcType=DOUBLE},
+			</if>
+			<if test="destMoney != null">
+				#{destMoney,jdbcType=DOUBLE},
+			</if>
+			<if test="time != null">
+				#{time,jdbcType=TIMESTAMP},
+			</if>
+			<if test="remark != null">
+				#{remark,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="userId != null">
+				#{userId,jdbcType=INTEGER},
+			</if>
+			<if test="isValid != null">
+				#{isValid,jdbcType=INTEGER}
+			</if>
+		</trim>
+	</insert>
+	
+	
+	<update id="update" parameterType="com.gj.wacai.transfer.pojo.Transfer">
+		update t_transfer
+		<set>
+			<if test="srcAccountId != null">
+				src_account_id = #{srcAccountId,jdbcType=INTEGER},
+			</if>
+			<if test="destAccountId != null">
+				dest_account_id = #{destAccountId,jdbcType=INTEGER},
+			</if>
+			<if test="srcMoney != null">
+				src_money = #{srcMoney,jdbcType=DOUBLE},
+			</if>
+			<if test="destMoney != null">
+				dest_money = #{destMoney,jdbcType=DOUBLE},
+			</if>
+			<if test="time != null">
+				time = #{time,jdbcType=TIMESTAMP},
+			</if>
+			<if test="remark != null">
+				remark = #{remark,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				update_time = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="userId != null">
+				user_id = #{userId,jdbcType=INTEGER},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+
+	<select id="selectByParams" parameterType="transferQuery" resultType="transferDto">
+		select
+		<include refid="Dto_Column_List" />
+		from t_transfer t
+		left join t_account a1 on (t.src_account_id = a1.id)
+		left join t_account a2 on (t.dest_account_id = a2.id)
+		<where>
+			t.user_id = #{userId} and t.is_valid = 1
+			<if test="queryTransferSrcAccountId != null">
+				and t.src_account_id = #{queryTransferSrcAccountId}
+			</if>
+			<if test="queryTransferDestAccountId != null">
+				and t.dest_account_id = #{queryTransferDestAccountId}
+			</if>
+			<if test="queryTransferTime!=null and queryTransferTime!=''">
+    		<![CDATA[
+    		and t.time <= #{queryTransferTime}
+    		]]>
+			</if>
+		</where>
+	</select>
+
+	<select id="selectByIdAndUserId" resultMap="BaseResultMap">
+		select <include refid="Base_Column_List" />
+		from t_transfer
+		where id = #{id} and user_id = #{userId} and is_valid = 1
+	</select>
+	
+	<update id="deleteByIdAndUserId">
+		update t_transfer
+		set is_valid = 0
+		where id = #{id} and user_id = #{userId}
+	</update>
+</mapper>

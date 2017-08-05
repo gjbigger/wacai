@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gj.wacai.report.dao.ReportDao">
+
+	<select id="selectAccountForReport" resultType="accountDto">
+		select
+			a.id as id, a.name as name, a.balance as balance,
+			au.name as unitName, au.abbreviation as unitAbbreviation,
+			at.name as typeName
+		from t_account a
+		left join t_account_unit au on (a.unit_id = au.id)
+		left join t_account_type at on (a.type_id = at.id)
+		where a.user_id = #{userId} 
+			and a.is_valid = 1
+	</select>
+	
+	
+	
+	<select id="selectPayInGroupByAccountId" resultType="payInReportDto">
+		select a.name as accountName, sum(p.money) as money
+		from t_pay_in p
+		left join t_account a on (p.account_id = a.id)
+		where p.user_id = #{userId} and p.is_valid = 1
+			<![CDATA[
+				and p.time <= #{endTime} and p.time >= #{startTime}
+			]]>
+		<if test="typeId!=null">
+			and p.type_id = #{typeId}
+		</if>
+		and a.unit_id = #{unitId}
+		GROUP BY p.account_id;
+	</select>
+	
+	<select id="selectPayInGroupByTypeId" resultType="payInReportDto">
+		select pt.name as typeName, sum(p.money) as money
+		from t_pay_in p
+		left join t_pay_in_type pt on (p.type_id = pt.id)
+		left join t_account a on (p.account_id = a.id)
+		where p.user_id = #{userId} and p.is_valid = 1
+			<![CDATA[
+				and p.time <= #{endTime} and p.time >= #{startTime}
+			]]>
+		<if test="accountId!=null">
+			and p.account_id = #{accountId}
+		</if>
+		and a.unit_id = #{unitId}
+		group by p.type_id;
+	</select>
+	
+	<select id="selectPayInGroupByMonth" resultType="payInReportDto">
+		select DATE_FORMAT(p.time,'%m') as month, sum(p.money) as money
+		from t_pay_in p
+		left join t_account a on (p.account_id = a.id)
+		where p.user_id = #{userId} and p.is_valid = 1
+				and DATE_FORMAT(p.time,'%Y') = #{year}
+				and a.unit_id = #{unitId}
+		group by DATE_FORMAT(p.time, '%m');
+	</select>
+	
+	
+	
+	
+	
+	<select id="selectPayOutGroupByAccountId" resultType="payOutReportDto">
+		select a.name as accountName, sum(p.money) as money
+		from t_pay_out p
+		left join t_account a on (p.account_id = a.id)
+		where p.user_id = #{userId} and p.is_valid = 1
+			<![CDATA[
+				and p.time <= #{endTime} and p.time >= #{startTime}
+			]]>
+		<if test="typeId!=null">
+			and p.big_type_id = #{typeId}
+		</if>
+		and a.unit_id = #{unitId}
+		GROUP BY p.account_id;
+	</select>
+	
+	<select id="selectPayOutGroupByTypeId" resultType="payOutReportDto">
+		select pbt.name as typeName, sum(p.money) as money
+		from t_pay_out p
+		left join t_pay_out_big_type pbt on (p.big_type_id = pbt.id)
+		left join t_account a on (p.account_id = a.id)
+		where p.user_id = #{userId} and p.is_valid = 1
+			<![CDATA[
+				and p.time <= #{endTime} and p.time >= #{startTime}
+			]]>
+		<if test="accountId!=null">
+			and p.account_id = #{accountId}
+		</if>
+		and a.unit_id = #{unitId}
+		group by p.big_type_id;
+	</select>
+	
+	<select id="selectPayOutGroupByMonth" resultType="payOutReportDto">
+		select DATE_FORMAT(p.time,'%m') as month, sum(p.money) as money
+		from t_pay_out p
+		left join t_account a on (p.account_id = a.id)
+		where p.user_id = #{userId} and p.is_valid = 1
+				and DATE_FORMAT(p.time,'%Y') = #{year}
+				and a.unit_id = #{unitId}
+		group by DATE_FORMAT(p.time, '%m');
+	</select>
+	
+	
+	
+	
+	<select id="selectPayInAllYear" resultType="Double">
+		select sum(money)
+		from t_pay_in p
+		left join t_account a on (p.account_id = a.id)
+		where p.is_valid = 1 and p.user_id = #{userId}
+			and DATE_FORMAT(p.time,'%Y') = #{year}
+			and a.unit_id = #{unitId}
+	</select>
+	
+	<select id="selectPayOutAllYear" resultType="Double">
+		select sum(money)
+		from t_pay_out p
+		left join t_account a on (p.account_id = a.id)
+		where p.is_valid = 1 and p.user_id = #{userId}
+			and DATE_FORMAT(p.time,'%Y') = #{year}
+			and a.unit_id = #{unitId}
+	</select>
+	
+	
+	
+	
+	<select id="selectPayOutAllDate" resultType="Double">
+		select sum(money)
+		from t_pay_out p
+		left join t_account a on (p.account_id = a.id)
+		where p.is_valid = 1 and p.user_id = #{userId}
+			and DATE_FORMAT(p.time, '%Y-%m-%d') = #{date}
+			and a.unit_id = #{unitId}
+	</select>
+	
+	<select id="selectPayOutAllMonth" resultType="Double">
+		select sum(money)
+		from t_pay_out p
+		left join t_account a on (p.account_id = a.id)
+		where p.is_valid = 1 and p.user_id = #{userId}
+			and DATE_FORMAT(p.time, '%Y-%m') = #{month}
+			and a.unit_id = #{unitId}
+	</select>
+</mapper>
